@@ -1,0 +1,3 @@
+arii_doc_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: AriiDocBundle:Default:index }
