@@ -1,0 +1,113 @@
+{% extends "AriiCoreBundle::base.html.twig" %}
+{% block head %}
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+<!-- Optional theme -->
+<link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-theme.min.css') }}">
+<!-- Latest compiled and minified JavaScript -->
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('bundles/ariiats/js/jquery.tablesorter.min.js') }}"></script>
+<style>
+@media print {
+    body {
+        -webkit-print-color-adjust: exact; 
+    }
+    .jumbotron {
+        background-color: #EEEEEE !important;
+    }
+    .panel-danger .panel-heading {
+        background-color: #fbb4ae !important;
+    }
+    .panel-warning .panel-heading {
+        background-color: #ffffcc !important;
+    }
+    .panel-success .panel-heading {
+        background-color: #ccebc5 !important;
+    }
+    .progress-bar-danger {
+        background-color: #fbb4ae !important;
+    }
+    .progress-bar-warning {
+        background-color: #ffffcc !important;
+    }
+    .progress-bar-success {
+        background-color: #ccebc5 !important;
+    }
+}    
+</style>
+{% endblock %} 
+{% block body %}
+<body>
+<div class="container-fluid">
+<div class="jumbotron">
+<img style="float: right;" src="{{ asset('logo.png') }}"/>
+  <h1>{{ Doc.title }}</h1>
+  <p>{{ Doc.description }}</p>
+  <p>{{ "Author" | trans }}: <stong>{{ Doc.author }}</strong></p>
+</div>
+{% if Part.user is defined %} 
+<div class="progress">
+  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ Doc.validated }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ Doc.validated }}%">
+    <span class="sr-only">{{ Doc.validated }}%</span>
+  </div>
+  <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{ Doc.in_progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ Doc.in_progress }}%">
+    <span class="sr-only">{{ Doc.in_progress }}%</span>
+  </div>
+</div>    
+{% endif %}
+{% for num,Part in Doc.parts %}
+{% if num>0 %}
+<h2>{{ num }}/{{ Doc.count }} - {{ Part.name }}</h2>
+{% endif %}
+<p style="font-family: Courier New">{{ Part.comment | text2html }}</p>
+
+{% if Part.exploit is defined %} 
+{% for num,exp in Part.exploit %}
+    
+{% if Part.user is defined %} 
+{% if Part.user.1.validated %} 
+<div class="panel panel-success">
+{% else %}    
+<div class="panel panel-warning">
+{% endif %} 
+{% else %}    
+<div class="panel panel-danger">
+{% endif %} 
+  <div class="panel-heading"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> {{ exp.message }}</div>
+  <div class="panel-body">
+      <dl class="dl-horizontal">
+          <dt>{{ "Call" | trans }}</dt>
+          <dd>{{ exp.call }}</dd>
+          <dt>{{ "Parameters" | trans }}</dt>
+          <dd>{{ exp.parms}}</dd>
+          <dt>{{ "Exit" | trans }}</dt>
+          <dd>{{ exp.exit }}</dd>
+      <dl>
+{% if Part.user is defined %} 
+{% for num,usr in Part.user %}    
+<dl class="dl-horizontal">
+    <dt>{{ "Restart point" | trans }}</dt>
+    <dd>{% if usr.restart %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</dd>
+    <dt>{{ "Triggers" | trans }}</dt>
+    <dd>{{ usr.triggers }}</dd>
+    <dt>{{ "Constraints" | trans }}</dt>
+    <dd>{{ usr.constraints}}</dd>    
+<dl>
+{{ usr.instructions | md2html }}
+{% endfor %}
+{% endif %}    
+  </div>  
+</div>
+
+{% endfor %}
+{% endif %}
+
+<pre>{{ Part.code }}</pre>
+
+{% endfor %}
+</script>
+
+</body>
+{% endblock %}
+{% block cron %}{% endblock %}

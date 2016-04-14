@@ -1,0 +1,27 @@
+{
+   "items":
+   [
+      {   "type":"block", 
+          text:"{{ "module.Doc" | trans }}", 
+          "text_pos": "top", 
+          "list":
+          [
+             {   "type": "button", 
+                 text:"", 
+                 id: "menu_home",
+                 "isbig": true, 
+                 "img": "48/doc.png"
+              },
+             {   "type": "buttonSelect", 
+                 text:"", 
+                 "img": "folder_page.png", 
+                 items:
+                 [ 
+                    { id:"load", text: "{{ "Load" | trans }}", img: "load.png" },
+                    { id:"deploy", text: "{{ "Deploy" | trans }}", img: "deploy.png" }
+                 ]
+              }
+          ]
+      }
+   ]
+}

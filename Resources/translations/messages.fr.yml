@@ -1,0 +1,4 @@
+module.Doc: Documentation
+summary.Doc: Traitements des scrips pour extraire la partie documentation.
+text.Doc: Ce module permet de documenter des fichiers tiers sans les modifier. 
+Author: Auteur

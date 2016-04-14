@@ -1,3 +1,95 @@
-arii_doc_homepage:
-    path:     /hello/{name}
+arii_Doc_index:
+    pattern:  /
     defaults: { _controller: AriiDocBundle:Default:index }
+
+arii_Doc_readme:
+    pattern:  /
+    defaults: { _controller: AriiDocBundle:Default:readme }
+
+json_Doc_ribbon:
+    pattern:  /ribbon.json
+    defaults: { _controller: AriiDocBundle:Default:ribbon }
+
+xml_Doc_menu:
+    pattern:  /menu.xml
+    defaults: { _controller: AriiDocBundle:Default:menu }
+    
+xml_Doc_toolbar:
+    pattern:  /toolbar.xml
+    defaults: { _controller: AriiDocBundle:Default:toolbar }
+
+xml_Doc_tree:
+    pattern:  /tree.xml
+    defaults: { _controller: AriiDocBundle:Default:tree }
+
+# --------------------------------------------------------------------------
+# Edition
+# --------------------------------------------------------------------------
+arii_Doc_edit:
+    pattern:  /edit/{path}
+    defaults: { _controller: AriiDocBundle:Folder:index, path: 'test' }
+    requirements:
+        path: .+
+
+# --------------------------------------------------------------------------
+# Folders
+# --------------------------------------------------------------------------
+xml_Doc_folders_list:
+    pattern:  /folders/list.xml
+    defaults: { _controller: AriiDocBundle:Folder:folders }
+        
+
+# --------------------------------------------------------------------------
+# Folder
+# --------------------------------------------------------------------------
+arii_Doc_folder:
+    pattern:  /folder
+    defaults: { _controller: AriiDocBundle:Folder:index }
+
+xml_Doc_folder_list:
+    pattern:  /folder/list.xml
+    defaults: { _controller: AriiDocBundle:Folder:list }
+        
+html_Doc_file:
+    pattern:  /folder/file.html
+    defaults: { _controller: AriiDocBundle:Folder:file }
+    
+html_Doc_doc:
+    pattern:  /folder/doc.html
+    defaults: { _controller: AriiDocBundle:Doc:doc }
+
+pdf_Doc_doc:
+    pattern:  /folder/doc.pdf
+    defaults: { _controller: AriiDocBundle:Doc:pdf }
+
+xml_Doc_folder_toolbar:
+    pattern:  /folder/toolbar.xml
+    defaults: { _controller: AriiDocBundle:Folder:toolbar }
+
+# --------------------------------------------------------------------------
+# Doc
+# --------------------------------------------------------------------------
+
+xml_Doc_doc_delete:
+    pattern:  /doc/delete.xml
+    defaults: { _controller: AriiDocBundle:Doc:delete }
+
+xml_Doc_file_grid:
+    pattern:  /doc/grid.xml
+    defaults: { _controller: AriiDocBundle:Doc:grid }    
+
+xml_Doc_file_form:
+    pattern:  /doc/form.xml
+    defaults: { _controller: AriiDocBundle:Doc:form }    
+    
+xml_Doc_form_toolbar:
+    pattern:  /doc/toolbar.xml
+    defaults: { _controller: AriiDocBundle:Doc:toolbar }        
+
+xml_Doc_user_save:
+    pattern:  /doc/save.xml
+    defaults: { _controller: AriiDocBundle:Doc:save }    
+
+xml_Doc_user_delete:
+    pattern:  /doc/delete.xml
+    defaults: { _controller: AriiDocBundle:Doc:deleteUser }    

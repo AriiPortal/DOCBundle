@@ -2,3 +2,21 @@ services:
 #    arii_doc.example:
 #        class: Arii\DocBundle\Example
 #        arguments: [@service_id, "plain_value", %parameter%]
+    arii_doc.markdown:
+        class: Arii\DocBundle\Service\Markdown
+        
+    arii_doc.doc:
+        class: Arii\DocBundle\Service\AriiDoc
+        arguments: [  ]
+
+    doc_import.CL:
+        class: Arii\DocBundle\Service\ImportCL
+        arguments: [  ]
+
+    doc.twig.doc_extension:
+        class:     Arii\DocBundle\Twig\MDExtension
+        arguments: ['@arii_doc.markdown']
+        public:    false
+        tags:
+            - { name: twig.extension }
+            

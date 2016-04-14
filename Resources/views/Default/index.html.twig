@@ -1,1 +1,48 @@
-Hello {{ name }}!
+{# src/Arii/JOCBundle/Resources/views/index.html.twig #}
+{% extends "AriiDocBundle::layout.html.twig" %}
+{% block body %}
+<!--[if !IE]>start section<![endif]-->	
+<script>
+dhtmlxEvent(window,"load",function(){     
+
+    globalLayout = new dhtmlXLayoutObject(document.body, "2U");
+    globalLayout.cells("a").hideHeader();
+    globalLayout.cells("a").setWidth(420);
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_Doc_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+    
+    myMenu = new dhtmlXMenuObject();
+    myMenu.renderAsContextMenu();
+    myMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    myMenu.loadStruct("{{ url('xml_JOE_menu') }}");
+
+    globalLayout.cells("b").hideHeader();
+    globalLayout.cells("b").attachURL('{{ asset('/bundles/ariicore/images/arii.jpg') }}');
+    
+    myGrid = globalLayout.cells("a").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Type" | trans }},{{ "Folder" | trans }}");
+    myGrid.attachHeader("#select_filter,#text_filter");
+    myGrid.setInitWidths("100,*");
+    myGrid.setColAlign("left,left");
+    myGrid.setColTypes("ro,ro");
+    myGrid.setColSorting("str,str");
+    myGrid.enableAlterCss("","");
+    myGrid.init();
+    myGrid.load( "{{ url('xml_Doc_folders_list') }}" );
+    myGrid.attachEvent("onRowDblClicked",function (id) {
+        window.location = "{{ url("arii_Doc_index") }}edit/"+id;
+    } );
+    
+});
+</script>
+{% endblock %}
