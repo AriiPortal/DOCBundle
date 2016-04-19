@@ -11,16 +11,25 @@
                  id: "menu_home",
                  "isbig": true, 
                  "img": "48/doc.png"
-              },
+             },
+             {   "type": "button", 
+                 text:"", 
+                 id: "menu_note",
+                 "img": "note.png"
+             }                           
+             {% if Folder is not empty %}
+             ,
              {   "type": "buttonSelect", 
                  text:"", 
                  "img": "folder_page.png", 
                  items:
                  [ 
-                    { id:"load", text: "{{ "Load" | trans }}", img: "load.png" },
-                    { id:"deploy", text: "{{ "Deploy" | trans }}", img: "deploy.png" }
+                    {% for file in Folder %} 
+                    { id: "{{ file.id }}", text: "{{ file.name }}"},
+                    {% endfor %}            
                  ]
               }
+              {% endif %}
           ]
       }
    ]

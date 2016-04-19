@@ -14,10 +14,26 @@ class DefaultController extends Controller
 
     public function ribbonAction()
     {
+        $workspace= $this->container->getParameter('workspace');
+        $dir = $workspace."/Doc";
+        $Folder = array();
+        if ($dh = opendir($dir)) {
+            while (($file = readdir($dh)) !== false) {
+                if (!is_file("$dir/$file") and substr($file,0,1)!='.') {                    
+                    if (($p=strpos($file,'] '))>0) {
+                        $Folder["$dir/$file"]['id'] = $file;
+                        $Folder["$dir/$file"]['name'] = $file;
+                        $Folder["$dir/$file"]['type'] = strtolower(substr($file,1,$p-1));
+                    }
+                }
+            }
+            closedir($dh);
+        }        
+        sort($Folder);
         
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
-        return $this->render('AriiDocBundle:Default:ribbon.json.twig',array(), $response);
+        return $this->render('AriiDocBundle:Default:ribbon.json.twig',array('Folder'=>$Folder), $response);
     }
 
     public function menuAction()

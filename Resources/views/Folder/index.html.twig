@@ -40,7 +40,11 @@ dhtmlxEvent(window,"load",function(){
     myGrid.enableAlterCss("","");
     myGrid.init();
 
-    myGridToolbar = globalLayout.cells("b").attachToolbar();
+    myGlobalTab = globalLayout.cells("b").attachTabbar();
+    myGlobalTab.addTab("doc","{{ "Document" | trans }}","100px", null, true);        
+    myGlobalTab.addTab("file","{{ "Original" | trans }}","100px");        
+
+    myGridToolbar = myGlobalTab.cells("doc").attachToolbar();
     myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
     myGridToolbar.loadStruct( "{{ url('xml_Doc_folder_toolbar') }}");
     myGridToolbar.attachEvent("onClick",function(itemid){
@@ -55,7 +59,7 @@ dhtmlxEvent(window,"load",function(){
                             globalLayout.progressOn();
                             dhx4.ajax.get("{{ url('xml_Doc_doc_delete') }}?file="+file,function(loader){
                                 if(loader.xmlDoc.responseText==="success"){
-                                    globalLayout.cells("b").attachURL('{{ url('html_Doc_doc') }}?file='+encodeURIComponent(file));
+                                    myGlobalTab.cells("doc").attachURL('{{ url('html_Doc_doc') }}?file='+encodeURIComponent(file));
                                     dhtmlx.message({
                                        title:"Save",
                                        type: "Notice",
@@ -93,27 +97,39 @@ dhtmlxEvent(window,"load",function(){
     });
 
     globalLayout.cells("b").hideHeader();
-    globalLayout.cells("b").attachURL('{{ asset('/bundles/ariicore/images/arii.jpg') }}');
+    myGlobalTab.cells("doc").attachURL('{{ asset('/bundles/ariicore/images/arii.jpg') }}');
 
-    myTab = globalLayout.cells("c").attachTabbar();
-    myTab.addTab("edit","{{ "Edit" | trans }}","100px", null, true);        
-    myTab.addTab("file","{{ "File" | trans }}","100px");        
+    myLayout = globalLayout.cells("c").attachLayout("2U");
+    myLayout.cells("a").hideHeader();
+    myLayout.cells("b").hideHeader();
+            
+    myTab = myLayout.cells("a").attachTabbar();
+    myTab.addTab("messages","{{ "Messages" | trans }}","100px", null, true);        
+    myTab.addTab("help","{{ "Notes" | trans }}","100px");        
 
-    myEdit = myTab.cells("edit").attachLayout("2U");    
-    myList = myEdit.cells("a").hideHeader();
-    myList = myEdit.cells("b").hideHeader();
-
-    myList = myEdit.cells("a").attachGrid();
+    myList = myTab.cells("messages").attachGrid();
     myList.selMultiRows = true;
     myList.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myList.setHeader("{{ "Part" | trans }},{{ "Message" | trans }}");
-    myList.attachHeader("#text_filter,#text_filter");
-    myGrid.setInitWidths("200,*");
-    myList.setColAlign("left,left");
-    myList.setColTypes("ro,ro");
-    myList.setColSorting("str,str");
+    myList.setHeader("{{ "Part" | trans }},{{ "Message" | trans }},{{ "Exit" | trans }}");
+    myList.attachHeader("#text_filter,#text_filter,#select_filter");
+    myList.setInitWidths("200,*,0");
+    myList.setColAlign("left,left,right");
+    myList.setColTypes("ro,ro,ro");
+    myList.setColSorting("str,str,str");
     myList.enableAlterCss("","");    
     myList.init();
+
+    myHelp = myTab.cells("help").attachGrid();
+    myHelp.selMultiRows = true;
+    myHelp.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myHelp.setHeader("{{ "Message" | trans }},{{ "Note" | trans }}");
+    myHelp.attachHeader("#text_filter,#text_filter");
+    // myHelp.setInitWidths("*,*");
+    myHelp.setColAlign("left,left");
+    myHelp.setColTypes("ro,ro");
+    myHelp.setColSorting("str,str");
+    myHelp.enableAlterCss("","");    
+    myHelp.init();
 
     formData = [
         { type: "settings", position: "label-left", labelWidth: 70, inputWidth: 600,labelAlign: "right" },
@@ -154,10 +170,10 @@ dhtmlxEvent(window,"load",function(){
             label: "{{ "Restart point" | trans }}"
          }
      ];
-    myForm = myEdit.cells("b").attachForm(formData);
+    myForm = myLayout.cells("b").attachForm(formData);
     myForm.enableLiveValidation(true);
 
-    myFormToolbar = myEdit.cells("b").attachToolbar();
+    myFormToolbar = myLayout.cells("b").attachToolbar();
     myFormToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
     myFormToolbar.loadStruct( "{{ url('xml_Doc_form_toolbar') }}");
     myFormToolbar.attachEvent("onClick",function(itemid){
@@ -187,21 +203,21 @@ dhtmlxEvent(window,"load",function(){
                     ok: "{{ "Yes" | trans }}" });
                 break;
             case 'save':
-                myEdit.cells("b").progressOn();
-                myEdit.cells("a").progressOn();
+                myLayout.cells("b").progressOn();
+                myLayout.cells("a").progressOn();
                 myForm.send("{{ url('xml_Doc_user_save') }}","POST",function(loader,response){
                     dhtmlx.message({
                     type: "Notice",
                     expire: 10000,
                     width: "500px",
                     text: loader.xmlDoc.responseText });
-                    myEdit.cells("b").progressOn();
-                    globalLayout.cells("b").attachURL('{{ url('html_Doc_doc') }}?file='+encodeURIComponent(file));
+                    myLayout.cells("b").progressOn();
+                    myGlobalTab.cells("doc").attachURL('{{ url('html_Doc_doc') }}?file='+encodeURIComponent(file));
                     myList.clearAll();
                     myList.load("{{ url('xml_Doc_file_grid') }}?file="+encodeURIComponent(file), function() {
-                        myEdit.cells("a").progressOff();
+                        myLayout.cells("a").progressOff();
                     });                    
-                    myEdit.cells("b").progressOff();
+                    myLayout.cells("b").progressOff();
                 });
                 break;
             default:
@@ -214,19 +230,31 @@ dhtmlxEvent(window,"load",function(){
     myGrid.attachEvent("onRowDblClicked", function(id) {
         globalLayout.cells("c").expand();
         file = id;
-        globalLayout.cells("b").attachURL('{{ url('html_Doc_doc') }}?file='+encodeURIComponent(id));
+        myGlobalTab.cells("doc").attachURL('{{ url('html_Doc_doc') }}?file='+encodeURIComponent(id));
         myList.clearAll();
-        myList.load("{{ url('xml_Doc_file_grid') }}?file="+encodeURIComponent(id));
-        myTab.cells("file").attachURL('{{ url('html_Doc_file') }}?file='+encodeURIComponent(id));
-    });
-    
-    myList.attachEvent("onRowDblClicked", function(id) {
-        myEdit.cells("b").progressOn();
-        myForm.load("{{ url('xml_Doc_file_form') }}?id="+id, function() {
-            myEdit.cells("b").progressOff();            
+        myList.load("{{ url('xml_Doc_file_grid') }}?file="+encodeURIComponent(id), function () {
+            myHelp.clearAll();
+            myHelp.load("{{ url('xml_Doc_help_grid') }}?file="+encodeURIComponent(id), function () {
+                myGlobalTab.cells("file").attachURL('{{ url('html_Doc_file') }}?file='+encodeURIComponent(id));
+            });
         });
     });
     
+    myList.attachEvent("onRowDblClicked", function(id) {
+        myLayout.cells("b").progressOn();
+        myForm.load("{{ url('xml_Doc_file_form') }}?id="+id, function() {
+            myLayout.cells("b").progressOff();            
+        });
+    });
+    
+    // Charger une note comme consigne par défaut
+    myHelp.attachEvent("onRowDblClicked", function(id) {
+        myLayout.cells("b").progressOn();
+        myForm.load("{{ url('xml_Doc_help_form') }}?id="+id, function() {
+            myLayout.cells("b").progressOff();            
+        });
+    });
+
     globalLayout.cells("b").attachEvent("onContentLoaded", function(id){
         // globalLayout.cells("b").progressOff();
     });    

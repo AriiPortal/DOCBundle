@@ -32,6 +32,44 @@ arii_Doc_edit:
         path: .+
 
 # --------------------------------------------------------------------------
+# Notes
+# --------------------------------------------------------------------------
+arii_Doc_notes:
+    pattern:  /notes
+    defaults: { _controller: AriiDocBundle:Notes:index }
+
+xml_Doc_notes_toolbar:
+    pattern:  /notes/toolbar.xml
+    defaults: { _controller: AriiDocBundle:Notes:toolbar }
+
+xml_Doc_notes_list:
+    pattern:  /notes/list.xml
+    defaults: { _controller: AriiDocBundle:Notes:list }
+
+xml_Doc_notes_parts:
+    pattern:  /notes/parts.xml
+    defaults: { _controller: AriiDocBundle:Notes:parts }
+
+html_Doc_note:
+    pattern:  /note
+    defaults: { _controller: AriiDocBundle:Notes:index }
+    
+xml_Doc_note_delete:
+    pattern:  /notes/delete.xml
+    defaults: { _controller: AriiDocBundle:Notes:delete }
+
+xml_Doc_note_save:
+    pattern:  /notes/save.xml
+    defaults: { _controller: AriiDocBundle:Notes:save }
+    
+xml_Doc_note_form:
+    pattern:  /notes/form.xml
+    defaults: { _controller: AriiDocBundle:Notes:form }
+
+xml_Doc_note_part:    
+    pattern:  /note/part.xml
+    defaults: { _controller: AriiDocBundle:Notes:note_on_part }
+# --------------------------------------------------------------------------
 # Folders
 # --------------------------------------------------------------------------
 xml_Doc_folders_list:
@@ -78,10 +116,18 @@ xml_Doc_file_grid:
     pattern:  /doc/grid.xml
     defaults: { _controller: AriiDocBundle:Doc:grid }    
 
+xml_Doc_help_grid:
+    pattern:  /help/grid.xml
+    defaults: { _controller: AriiDocBundle:Doc:help }    
+
 xml_Doc_file_form:
     pattern:  /doc/form.xml
     defaults: { _controller: AriiDocBundle:Doc:form }    
     
+xml_Doc_help_form:
+    pattern:  /help/form.xml
+    defaults: { _controller: AriiDocBundle:Doc:form_help }    
+
 xml_Doc_form_toolbar:
     pattern:  /doc/toolbar.xml
     defaults: { _controller: AriiDocBundle:Doc:toolbar }        

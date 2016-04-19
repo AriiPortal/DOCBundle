@@ -28,8 +28,14 @@ class DocController extends Controller
         
         $id = $file->getId();
                 
+        $db = $this->container->get('arii_core.db');
+        $Arii = $db->getAriiDatabase();
+        
         $sql = $this->container->get('arii_core.sql');
-        $qry = $sql->Select(array('c.ID','NAME','MESSAGE','VALIDATED'))
+        $sql->InitDB($Arii); 
+        
+        $sql = $this->container->get('arii_core.sql');
+        $qry = $sql->Select(array('c.ID','NAME','MESSAGE','EXIT_CODE','VALIDATED'))
                 .$sql->From(array('DOC_CALL c'))
                 .$sql->LeftJoin('DOC_PART p',array('c.PART_ID','p.ID'))
                 .$sql->LeftJoin('DOC_USER u',array('c.ID','u.CALL_ID'))
@@ -39,9 +45,41 @@ class DocController extends Controller
         $dhtmlx = $this->container->get('arii_core.db');
         $data = $dhtmlx->Connector('grid');
         $data->event->attach("beforeRender",array($this,"grid_render"));
-        $data->render_sql($qry,'ID','NAME,MESSAGE');
+        $data->render_sql($qry,'ID','NAME,MESSAGE,EXIT_CODE');
     }
     
+    public function helpAction()
+    {
+        $request = Request::createFromGlobals();
+        $id = $request->get('file');
+
+        $em = $this->getDoctrine()->getManager();
+        $file = $em->getRepository('AriiDocBundle:File')->findOneBy(array('file' => $id));
+        
+        if (!$file) exit();
+        
+        $id = $file->getId();
+                
+        $db = $this->container->get('arii_core.db');
+        $Arii = $db->getAriiDatabase();
+        
+        $sql = $this->container->get('arii_core.sql');
+        $sql->InitDB($Arii); 
+        
+        $sql = $this->container->get('arii_core.sql');
+        $qry = $sql->Select(array('distinct c.ID','p.NAME','MESSAGE','n.TITLE','n.ID as NOTE_ID'))
+                .$sql->From(array('DOC_NOTE n'))
+                .$sql->LeftJoin('DOC_CALL c',array('c.MESSAGE','n.NAME'),'like')
+                .$sql->LeftJoin('DOC_PART p',array('c.PART_ID','p.ID'))
+                .$sql->Where(array('FILE_ID' => $id))
+                .$sql->OrderBy(array('SEQ'));
+
+        $dhtmlx = $this->container->get('arii_core.db');
+        $data = $dhtmlx->Connector('grid');
+//        $data->event->attach("beforeRender",array($this,"grid_render"));
+        $data->render_sql($qry,'ID','MESSAGE,TITLE,NOTE_ID');
+    }
+
     function grid_render ($data){
         if ($data->get_value('VALIDATED')=='')
             $data->set_row_color("#fbb4ae");
@@ -57,13 +95,17 @@ class DocController extends Controller
         $request = Request::createFromGlobals();
         $id = $request->get('id');
 
+        $db = $this->container->get('arii_core.db');
+        $Arii = $db->getAriiDatabase();
+        
         $sql = $this->container->get('arii_core.sql');
+        $sql->InitDB($Arii);
+        
         $qry = $sql->Select(array('u.ID as USER_ID','MESSAGE','TITLE','TRIGGERS','CONSTRAINTS','DESCRIPTION','RESTART','VALIDATED','INSTRUCTIONS','c.ID as CALL_ID'))
                 .$sql->From(array('DOC_CALL c'))
                 .$sql->LeftJoin('DOC_USER u',array('c.ID','u.CALL_ID'));
 
-        $dhtmlx = $this->container->get('arii_core.db');
-        $data = $dhtmlx->Connector('form');
+        $data = $db->Connector('form');
         $data->event->attach("beforeRender",array($this,"form_render"));
         $data->render_sql($qry,'c.ID','ID,TITLE,TRIGGERS,CONSTRAINTS,DESCRIPTION,INSTRUCTIONS,CALL_ID,RESTART,VALIDATED');
     }
@@ -74,6 +116,32 @@ class DocController extends Controller
             $data->set_value( 'TITLE', $data->get_value('MESSAGE') );
     }
 
+    public function form_helpAction()
+    {
+        $request = Request::createFromGlobals();
+        $id = $request->get('id');
+
+        $db = $this->container->get('arii_core.db');
+        $Arii = $db->getAriiDatabase();
+        
+        $sql = $this->container->get('arii_core.sql');
+        $sql->InitDB($Arii);
+
+        $qry = $sql->Select(array('c.ID','n.NAME','c.MESSAGE','n.TITLE','n.DESCRIPTION','n.NOTE as INSTRUCTIONS','n.ID as NOTE_ID','c.ID as CALL_ID'))
+                .$sql->From(array('DOC_CALL c'))
+                .$sql->LeftJoin('DOC_NOTE n',array('c.MESSAGE','n.NAME'),'like');
+
+        $data = $db->Connector('form');
+        // $data->event->attach("beforeRender",array($this,"form_helper"));
+        $data->render_sql($qry,'c.ID','TITLE,DESCRIPTION,INSTRUCTIONS,CALL_ID');
+    }
+
+    function form_helper ($data){
+        $data->set_value( 'RESTART', 0 );
+        if ($data->get_value('TITLE')=='')
+            $data->set_value( 'TITLE', $data->get_value('MESSAGE') );
+    }
+    
     public function saveAction()
     {
         $request = Request::createFromGlobals();
@@ -214,8 +282,14 @@ class DocController extends Controller
             }
             $File['count'] = $p;
             $File['calls'] = $nb_calls;
-            $File['in_progress'] = round($nb_in_progress*100/$nb_calls);
-            $File['validated'] = round($nb_validated*100/$nb_calls);
+            if ($nb_calls>0) {
+                $File['in_progress'] = round($nb_in_progress*100/$nb_calls);
+                $File['validated'] = round($nb_validated*100/$nb_calls);
+            }
+            else {
+                $File['in_progress'] = 0;
+                $File['validated'] = 0;
+            }
         }
         
         $response = new Response();        
@@ -342,4 +416,5 @@ class DocController extends Controller
         $response->setContent(  file_get_contents($temp) );
         return $response;             
     }
+
 }

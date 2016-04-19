@@ -13,6 +13,14 @@ services:
         class: Arii\DocBundle\Service\ImportCL
         arguments: [  ]
 
+    doc_import.JIL:
+        class: Arii\DocBundle\Service\ImportJIL
+        arguments: [  ]
+
+    doc_import.YADE:
+        class: Arii\DocBundle\Service\ImportYADE
+        arguments: [  ]
+
     doc.twig.doc_extension:
         class:     Arii\DocBundle\Twig\MDExtension
         arguments: ['@arii_doc.markdown']

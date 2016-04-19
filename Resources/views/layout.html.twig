@@ -22,8 +22,11 @@ function ClickRibbon (itemid,state) {
         case 'menu_home':
             window.location = "{{ path('arii_Doc_index') }}";
             break;
+        case 'menu_note':
+            window.location = "{{ path('arii_Doc_notes') }}";
+            break;            
         default:
-            alert(itemid);
+            window.location = "{{ url("arii_Doc_index") }}edit/"+itemid;
     }
 }
 </script>
